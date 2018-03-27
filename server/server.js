@@ -1,5 +1,6 @@
 const path = require('path')
 const express = require('express')
+const url = require('url')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const _ = require('lodash')
@@ -14,6 +15,7 @@ var {mongoose} = require('./db/mongoose')
 
 const APP_PORT = process.env.PORT || 3000
 
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json())
 
 var originsWhitelist = [
@@ -101,9 +103,21 @@ app.delete('/api/heroes/:id', authorize, (req, res) => {
 })
 
 app.get('/api/heroes', authorize, (req, res) => {
-	Hero.find({})
-		.then(heroes => res.send(heroes))
-		.catch(error => res.status(400).send(error))
+  if(req.query){
+    let name = req.query.name
+    let query = {}
+    if(name){
+      query.name = name
+    }
+    Hero.find(query)
+      .then(heroes => res.send(heroes))
+      .catch(error => res.status(400).send(error))
+  } else {
+    Hero.find({})
+    .then(heroes => res.send(heroes))
+    .catch(error => res.status(400).send(error))
+  }
+	
 })
 
 app.listen(APP_PORT, () => {
