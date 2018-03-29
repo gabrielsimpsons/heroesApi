@@ -105,10 +105,17 @@ app.delete('/api/heroes/:id', authorize, (req, res) => {
 app.get('/api/heroes', authorize, (req, res) => {
   console.log(`query: ${JSON.stringify(req.query)}`)
   if(req.query){
-    let name = req.query.name
     let query = {}
-    if(name){
-      query.name = name
+    if(req.query.name){
+      let name = req.query.name.split(' ')
+      if(Array.isArray(name)){
+        query.name = {
+          $in: name
+        }
+      } else {
+        query.name = name
+      }
+      /*query.name = req.query.name*/
     }
     console.log(`Query final: ${JSON.stringify(query, 2, undefined)}`)
     Hero.find(query)
