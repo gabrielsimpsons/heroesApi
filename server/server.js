@@ -103,12 +103,14 @@ app.delete('/api/heroes/:id', authorize, (req, res) => {
 })
 
 app.get('/api/heroes', authorize, (req, res) => {
+  console.log(`query: ${JSON.stringify(req.query)}`)
   if(req.query){
     let name = req.query.name
     let query = {}
     if(name){
       query.name = name
     }
+    console.log(`Query final: ${JSON.stringify(query, 2, undefined)}`)
     Hero.find(query)
       .then(heroes => res.send(heroes))
       .catch(error => res.status(400).send(error))
